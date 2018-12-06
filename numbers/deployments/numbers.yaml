@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: varowner-numbers
+  labels:
+    app: numbers
+    owner: varowner
+spec:
+  selector:
+    matchLabels:
+      app: numbers
+      owner: varowner
+  template:
+    metadata:
+      labels:
+        app: numbers
+        tier: web
+        owner: varowner
+    spec:
+      containers:
+      - name: hypothesizer
+        image: gcr.io/windmill-public-containers/abc123/numbers
+        command: ["python", "/app/app.py"]
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            cpu: "10m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: varowner-numbers
+  labels:
+    app: hypothesizer
+    owner: varowner
+spec:
+  ports:
+    - port: 80
+      targetPort: 5000
+      protocol: TCP
+  selector:
+    app: numbers
+    owner: varowner
