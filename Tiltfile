@@ -17,72 +17,50 @@
 
 
 def get_username():
-  return local('whoami').rstrip('\n')
+    return str(local('whoami')).rstrip('\n')
 
 
 def m4_yaml(file):
-  read_file(file)
-  return local('m4 -Dvarowner=%s %s' % (repr(get_username()), repr(file)))
+    read_file(file)
+    return local('m4 -Dvarowner=%s %s' % (repr(get_username()), repr(file)))
 
 
-def abc123():
-  return composite_service([fe, letters, numbers])
+k8s_yaml([
+    m4_yaml('fe/deployments/fe.yaml'),
+    m4_yaml('letters/deployments/letters.yaml'),
+    m4_yaml('numbers/deployments/numbers.yaml'),
+])
 
+repo = local_git_repo('.')
+dockerfile_go = 'Dockerfile.go.base'
+dockerfile_js = 'Dockerfile.js.base'
+dockerfile_py = 'Dockerfile.py.base'
 
-def fe():
-  yaml = m4_yaml('fe/deployments/fe.yaml')
+# Service: frontend
+fe_img = 'gcr.io/windmill-public-containers/abc123/fe'
+fe_entrypt = '/go/bin/fe --owner ' + get_username()
 
-  image_name = 'gcr.io/windmill-public-containers/abc123/fe'
+fast_build(fe_img, dockerfile_go, fe_entrypt).\
+    add(repo.path('fe'), '/go/src/github.com/windmilleng/abc123/fe').\
+    run('go install github.com/windmilleng/abc123/fe')
+k8s_resource('fe', port_forwards=9000)
 
-  start_fast_build('Dockerfile.go.base', image_name, '/go/bin/fe --owner ' + get_username())
-  # path = '%s/src/github.com/windmilleng/abc123/fe' % gopath
-  path = '/go/src/github.com/windmilleng/abc123/fe'
+# Service: letters
+letters_img = 'gcr.io/windmill-public-containers/abc123/letters'
+letters_entrypt = 'node /app/index.js'
 
-  repo = local_git_repo('.')
-  add(repo.path('fe'), path)
+fast_build(letters_img, dockerfile_js, letters_entrypt).\
+    add(repo.path('letters/src'), '/app').\
+    add(repo.path('letters/package.json'), '/app/package.json').\
+    add(repo.path('letters/yarn.lock'), '/app/yarn.lock').\
+    run('cd /app && yarn install', trigger=['letters/package.json', 'letters/yarn.lock'])
+k8s_resource('letters', port_forwards=9001)
 
-  run('go install github.com/windmilleng/abc123/fe')
-  img = stop_build()
-  img.cache('/root/.cache/go-build/')
+# Service: numbers
+numbers_img = 'gcr.io/windmill-public-containers/abc123/numbers'
+numbers_entrypt = 'node /app/index.js'
 
-  s = k8s_service(img, yaml=yaml)
-  s.port_forward(9000)
-  return s
-
-
-def letters():
-  yaml = m4_yaml('letters/deployments/letters.yaml')
-
-  image_name = 'gcr.io/windmill-public-containers/abc123/letters'
-
-  start_fast_build('Dockerfile.js.base', image_name, 'node /app/index.js')
-  repo = local_git_repo('.')
-  add(repo.path('letters/src'), '/app')
-  add(repo.path('letters/package.json'), '/app/package.json')
-  add(repo.path('letters/yarn.lock'), '/app/yarn.lock')
-
-  run('cd /app && yarn install', trigger=['letters/package.json', 'letters/yarn.lock'])
-  img = stop_build()
-
-  s = k8s_service(img, yaml=yaml)
-  s.port_forward(9001)
-  return s
-
-
-def numbers():
-  yaml = m4_yaml('numbers/deployments/numbers.yaml')
-
-  image_name = 'gcr.io/windmill-public-containers/abc123/numbers'
-
-  start_fast_build('Dockerfile.py.base', image_name)
-  repo = local_git_repo('.')
-  add(repo.path('numbers'), "/app")
-
-  run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt')
-  img = stop_build()
-
-  s = k8s_service(img, yaml=yaml)
-  s.port_forward(9002)
-  return s
-
-
+fast_build(numbers_img, dockerfile_py). \
+    add(repo.path('numbers'), '/app'). \
+    run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt')
+k8s_resource('numbers', port_forwards=9002)
