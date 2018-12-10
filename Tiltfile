@@ -3,16 +3,13 @@
 """
 * Frontend
   * Language: Go
-  * Other notes: presents a grid of the results of calling all of the other services
-* Fortune
-  * Language: Go
-  * Other notes: Uses protobufs
-* Hypothesizer
-  * Language: Python
-  * Other notes: does a `pip install` for package dependencies. Reinstalls dependencies, only if the dependencies have changed.
-* Spoonerisms
+  * Other notes: calls out to both `letters` and `numbers` microservices.
+* Letters
   * Language: JavaScript
-  * Other notes: Uses yarn. Does a `yarn install` for package dependencies, only if the dependencies have changed
+  * Other notes: Uses yarn. Does a `yarn install` for package dependencies iff they have changed.
+* Numbers
+    * Language: Python
+    * Other notes: does a `pip install` for package dependencies. Reinstalls dependencies iff they have changed.
 """
 
 
