@@ -14,7 +14,9 @@
 
 
 def get_username():
-    return str(local('whoami')).rstrip('\n')
+    # return str(local('whoami')).rstrip('\n')
+    # HACK
+    return "maia"
 
 
 def m4_yaml(file):
