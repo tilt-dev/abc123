@@ -11,7 +11,7 @@ const letters = immutable.List([
 http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     let item = letters.get(Math.floor(Math.random()*letters.size))
-    res.end(item);
+    res.end(item + '\n');
 }).listen(5000, "0.0.0.0");
 
 console.log('Server running at http://127.0.0.1:5000/');

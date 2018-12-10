@@ -10,9 +10,10 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
-var serviceOwner = flag.String("owner", "", "If specified, abc123 will look for " +
+var serviceOwner = flag.String("owner", "", "If specified, abc123 will look for "+
 	"service names prefixed with this label")
 
 const (
@@ -80,7 +81,7 @@ func getLetter() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(resp), nil
+	return strings.TrimSpace(string(resp)), nil
 }
 
 func getNumber() (int, error) {
@@ -89,7 +90,7 @@ func getNumber() (int, error) {
 		return 0, err
 	}
 
-	s := string(resp)
+	s := strings.TrimSpace(string(resp))
 	num, err := strconv.Atoi(s)
 	if err != nil {
 		return 0, err
