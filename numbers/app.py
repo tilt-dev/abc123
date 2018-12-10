@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def rand_number():
-    return str(randint(1, 10001)) + '\n'
+    return str(randint(1, 10)) + '\n'
 
 
 if __name__ == '__main__':

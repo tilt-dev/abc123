@@ -28,43 +28,46 @@ type Info struct {
 
 func main() {
 	flag.Parse()
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t, err := template.ParseFiles(templatePath("index.tpl"))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "error parsing template: %v\n", err)
-			return
-		}
-
-		let, err := getLetter()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "error getting letter: %v\n", err)
-			return
-		}
-
-		num, err := getNumber()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "error getting number: %v\n", err)
-			return
-		}
-
-		info := Info{
-			Letter: let,
-			Number: num,
-		}
-
-		err = t.Execute(w, info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprintf(w, "error executing template: %v\n", err)
-			return
-		}
-	})
+	http.HandleFunc("/", handleMain)
+	http.HandleFunc("/get_rand", handleTextOnly)
 
 	log.Println("Serving the fontend on :8080")
 	http.ListenAndServe(":8080", nil)
+}
+
+func handleMain(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(templatePath("index.tpl"))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "error parsing template: %v\n", err)
+		return
+	}
+
+	let, err := getLetter()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "error getting letter: %v\n", err)
+		return
+	}
+
+	num, err := getNumber()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "error getting number: %v\n", err)
+		return
+	}
+
+	info := Info{
+		Letter: let,
+		Number: num,
+	}
+
+	err = t.Execute(w, info)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "error executing template: %v\n", err)
+		return
+	}
 }
 
 func templatePath(f string) string {
@@ -74,6 +77,25 @@ func templatePath(f string) string {
 	}
 
 	return filepath.Join(dir, f)
+}
+
+func handleTextOnly(w http.ResponseWriter, r *http.Request) {
+	let, err := getLetter()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "error getting letter: %v\n", err)
+		return
+	}
+
+	num, err := getNumber()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "error getting number: %v\n", err)
+		return
+	}
+
+	fmt.Fprintf(w, "Congrats, got random letter \"%s\" and random number \"%d\"\n", let, num)
+
 }
 
 func getLetter() (string, error) {
