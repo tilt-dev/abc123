@@ -94,7 +94,7 @@ func handleTextOnly(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Congrats, got random letter \"%s\" and random number \"%d\"\n", let, num)
+	fmt.Fprintf(w, "Random letter \"%s\"; random number \"%d\"\n", let, num)
 
 }
 
