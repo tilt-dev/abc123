@@ -51,7 +51,7 @@ fast_build(letters_img, dockerfile_js, letters_entrypt).\
     add(repo.path('letters/package.json'), '/app/package.json').\
     add(repo.path('letters/yarn.lock'), '/app/yarn.lock').\
     run('cd /app && yarn install', trigger=['letters/package.json', 'letters/yarn.lock'])
-k8s_resource('letters', port_forwards=9001)
+# k8s_resource('letters', port_forwards=9001)
 
 # Service: numbers
 numbers_img = 'gcr.io/windmill-public-containers/abc123/numbers'
@@ -60,4 +60,4 @@ numbers_entrypt = 'node /app/index.js'
 fast_build(numbers_img, dockerfile_py). \
     add(repo.path('numbers'), '/app'). \
     run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt')
-k8s_resource('numbers', port_forwards=9002)
+# k8s_resource('numbers', port_forwards=9002)
