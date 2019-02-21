@@ -32,7 +32,7 @@
 
 ### Step 3: Tilt Image Build ###
 # # Uncomment these lines to have Tilt build images for your code (and
-# # smartly re-build whenever things change on disk
+# # smartly re-build whenever things change on disk)
 # docker_build('abc123/fe', 'fe')            # == `docker build ./fe -t abc123/fe`
 # docker_build('abc123/letters', 'letters')  # == `docker build ./letters -t abc123/letters`
 # docker_build('abc123/numbers', 'numbers')  # == `docker build ./numbers -t abc123/numbers`
