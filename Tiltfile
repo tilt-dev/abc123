@@ -9,10 +9,10 @@
   * Other notes: Uses yarn. Does a `yarn install` for package dependencies iff they have changed.
 * Numbers
     * Language: Python
-    * Other notes: does a `pip install` for package dependencies. Reinstalls dependencies iff they have changed.
+    * Other notes: does a `pip install` for package dependencies. Re-installs dependencies iff they have changed.
 """
 ### Step 0: Hello World ###
-# Uncomment this to see Tilt do something!
+# # Uncomment this to see Tilt do something!
 # print("Welcome to Tilt! 👋")
 
 ### Step 1: Kubernetes YAML ###
@@ -36,13 +36,13 @@
 # docker_build('abc123/fe', 'fe')            # == `docker build ./fe -t abc123/fe`
 # docker_build('abc123/letters', 'letters')  # == `docker build ./letters -t abc123/letters`
 # docker_build('abc123/numbers', 'numbers')  # == `docker build ./numbers -t abc123/numbers`
-# k8s_resource('fe', port_forwards='8000') # HEY, LISTEN! delete the port-forward line above. Sorry ^_^'
 
 ### Step 4: Fast-Build ###
 # # The frontend builds pretty slowly, doesn't it? That's because every time you change it,
 # # Docker re-builds the container, which means it has to tar up a really big build context
 # # because of that pesky `fe/big_context` directory (16KB). Let's use fast-build instead,
 # # so only the files you update get moved around. Uncomment the lines below
+# # NOTE: comment out the `docker_build` for fe above 👀
 # repo = local_git_repo('.')
 # dockerfile_go = 'Dockerfile.go.base'
 # fe_img = 'abc123/fe'
@@ -56,7 +56,8 @@
 ### Step 5: Fast-Build ALL THE THINGS! ###
 # # The other builds are pretty fast, but why not make them even faster? Uncomment
 # # the rest of the Tiltfile to use fast-build for the other services as well.
-
+# # NOTE: comment out the rest of the `docker_build` calls above 👀
+#
 # dockerfile_js = 'Dockerfile.js.base'
 # dockerfile_py = 'Dockerfile.py.base'
 #
