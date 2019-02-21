@@ -19,6 +19,7 @@
 # # Start with just your existing Kubernetes yaml -- your services will run (if the
 # # images are available) and you can see their status and logs, but Tilt isn't
 # # building anything for you, so code changes won't be propagated
+# # NOTE: build these images first with `make build` 👀
 # k8s_yaml([
 #     'fe/deployments/fe.yaml',
 #     'letters/deployments/letters.yaml',
