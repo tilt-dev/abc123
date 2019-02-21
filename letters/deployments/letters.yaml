@@ -1,25 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: varowner-letters
+  name: letters
   labels:
     app: letters
-    owner: varowner
 spec:
   selector:
     matchLabels:
       app: letters
-      owner: varowner
   template:
     metadata:
       labels:
         app: letters
         tier: web
-        owner: varowner
     spec:
       containers:
       - name: letters
-        image: gcr.io/windmill-public-containers/abc123/letters
+        image: abc123/letters
         command: ["node", "/app/index.js"]
         ports:
         - containerPort: 5000
@@ -30,10 +27,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: varowner-letters
+  name: letters
   labels:
     app: letters
-    owner: varowner
 spec:
   ports:
     - port: 80
@@ -41,4 +37,3 @@ spec:
       protocol: TCP
   selector:
     app: letters
-    owner: varowner
