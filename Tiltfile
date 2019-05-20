@@ -13,7 +13,7 @@
 """
 ### Step 0: Hello World ###
 # # Uncomment this to see Tilt do something!
-# print("Welcome to Tilt! 👋")
+print("Welcome to Tilt! 👋")
 
 ### Step 1: Kubernetes YAML ###
 # # Start with just your existing Kubernetes yaml -- your services will run (if the
@@ -43,15 +43,14 @@
 # # because of that pesky `fe/big_context` directory (16KB). Let's use fast-build instead,
 # # so only the files you update get moved around. Uncomment the lines below
 # # NOTE: comment out the `docker_build` for fe above 👀
-# repo = local_git_repo('.')
-# dockerfile_go = 'Dockerfile.go.base'
-# fe_img = 'abc123/fe'
-# fe_entrypt = '/go/bin/fe'
-#
+
 # # Service: fe
-# fast_build(fe_img, dockerfile_go, fe_entrypt).\
-#     add(repo.path('fe'), '/go/src/github.com/windmilleng/abc123/fe').\
-#     run('go install github.com/windmilleng/abc123/fe')
+# docker_build('abc123/fe', 'fe',
+#              live_update=[
+#                  sync('./fe', '/go/src/github.com/windmilleng/abc123/fe'),
+#                  run('go install github.com/windmilleng/abc123/fe'),
+#                  restart_container()
+#              ])
 
 ### Step 5: Fast-Build ALL THE THINGS! ###
 # # The other builds are pretty fast, but why not make them even faster? Uncomment
