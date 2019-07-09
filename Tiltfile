@@ -13,7 +13,7 @@
 """
 ### Step 0: Hello World ###
 # # Uncomment this to see Tilt do something!
-print("Welcome to Tilt! 👋")
+# print("Welcome to Tilt! 👋")
 
 ### Step 1: Kubernetes YAML ###
 # # Start with just your existing Kubernetes yaml -- your services will run (if the
@@ -37,10 +37,10 @@ print("Welcome to Tilt! 👋")
 # docker_build('abc123/letters', 'letters')  # == `docker build ./letters -t abc123/letters`
 # docker_build('abc123/numbers', 'numbers')  # == `docker build ./numbers -t abc123/numbers`
 
-### Step 4: Fast-Build ###
+### Step 4: Live Update ###
 # # The frontend builds pretty slowly, doesn't it? That's because every time you change it,
 # # Docker re-builds the container, which means it has to tar up a really big build context
-# # because of that pesky `fe/big_context` directory (16KB). Let's use fast-build instead,
+# # because of that pesky `fe/big_context` directory (16KB). Let's use Live Update instead,
 # # so only the files you update get moved around. Uncomment the lines below
 # # NOTE: comment out the `docker_build` for fe above 👀
 
@@ -52,28 +52,24 @@ print("Welcome to Tilt! 👋")
 #                  restart_container()
 #              ])
 
-### Step 5: Fast-Build ALL THE THINGS! ###
+### Step 5: Live Update ALL THE THINGS! ###
 # # The other builds are pretty fast, but why not make them even faster? Uncomment
-# # the rest of the Tiltfile to use fast-build for the other services as well.
+# # the rest of the Tiltfile to use Live Update for the other services as well.
 # # NOTE: comment out the rest of the `docker_build` calls above 👀
 #
-# dockerfile_js = 'Dockerfile.js.base'
-# dockerfile_py = 'Dockerfile.py.base'
-#
 # # Service: letters
-# letters_img = 'abc123/letters'
-# letters_entrypt = 'node /app/index.js'
-#
-# fast_build(letters_img, dockerfile_js, letters_entrypt).\
-#     add(repo.path('letters/src'), '/app').\
-#     add(repo.path('letters/package.json'), '/app/package.json').\
-#     add(repo.path('letters/yarn.lock'), '/app/yarn.lock').\
-#     run('cd /app && yarn install', trigger=['letters/package.json', 'letters/yarn.lock'])
+# docker_build('abc123/letters', 'letters',
+#              live_update=[
+#                  sync('./letters/src', '/app'),
+#                  sync('./letters/package.json', '/app/package.json'),
+#                  sync('./letters/yarn.lock', '/app/yarn.lock'),
+#                  run('cd /app && yarn install', trigger=['./letters/package.json', './letters/yarn.lock']),
+#                  restart_container(),
+#              ])
 #
 # # Service: numbers
-# numbers_img = 'abc123/numbers'
-# numbers_entrypt = './app/app.py'
-#
-# fast_build(numbers_img, dockerfile_py). \
-#     add(repo.path('numbers'), '/app'). \
-#     run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt')
+# docker_build('abc123/numbers', 'numbers',
+#              live_update=[
+#                  sync('./numbers', '/app'),
+#                  run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt'),
+#              ])
