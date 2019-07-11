@@ -9,7 +9,7 @@
   * Other notes: Uses yarn. Does a `yarn install` for package dependencies iff they have changed.
 * Numbers
     * Language: Python
-    * Other notes: does a `pip install` for package dependencies. Re-installs dependencies iff they have changed.
+    * Other notes: does a `pip install` for package dependencies. Reinstalls dependencies iff they have changed.
 """
 
 ### NOTE: this Tiltfile / incremental onboarding experience currently only works on LOCAL k8s clusters
@@ -45,10 +45,10 @@
 
 ### Step 4: Live Update ###
 # # The frontend builds pretty slowly, doesn't it? That's because every time you change it,
-# # Docker re-builds the container, which means it has to tar up a really big build context
-# # because of that pesky `fe/big_context` directory (16KB). Let's use Live Update instead,
-# # so only the files you update get moved around. Uncomment the lines below
+# # Docker re-builds the container. Let's use Live Update instead, so nothing gets rebuilt,
+# # and only the files you update get moved around. Uncomment the lines below
 # # NOTE: comment out the `docker_build` for fe above 👀
+# # See docs: https://docs.tilt.dev/live_update_tutorial.html
 
 # # Service: fe
 # docker_build('abc123/fe', 'fe',
@@ -69,6 +69,7 @@
 #                  sync('./letters/src', '/app'),
 #                  sync('./letters/package.json', '/app/package.json'),
 #                  sync('./letters/yarn.lock', '/app/yarn.lock'),
+#                  # run `yarn install` IF `package.json` or `yarn.lock` has changed
 #                  run('cd /app && yarn install', trigger=['./letters/package.json', './letters/yarn.lock']),
 #                  restart_container(),
 #              ])
@@ -77,5 +78,6 @@
 # docker_build('abc123/numbers', 'numbers',
 #              live_update=[
 #                  sync('./numbers', '/app'),
+#                  # run `pip install` IF `requirements.txt` has changed
 #                  run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt'),
 #              ])
