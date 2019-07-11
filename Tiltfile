@@ -38,6 +38,7 @@
 ### Step 3: Tilt Image Build ###
 # # Uncomment these lines to have Tilt build images for your code (and
 # # smartly re-build whenever things change on disk)
+# # After this and following steps, try changing the first `log.Println` message in `fe/main.go` and see how Tilt behaves.
 # docker_build('abc123/fe', 'fe')            # == `docker build ./fe -t abc123/fe`
 # docker_build('abc123/letters', 'letters')  # == `docker build ./letters -t abc123/letters`
 # docker_build('abc123/numbers', 'numbers')  # == `docker build ./numbers -t abc123/numbers`
