@@ -32,6 +32,7 @@
 
 ### Step 2: Port Forwarding ###
 # # Uncomment this line to port-forward your frontend so you can hit it locally
+# # Once you've done this, you'll be able to access the 'fe' service in your browser at http://localhost:8000
 # k8s_resource('fe', port_forwards='8000')
 
 ### Step 3: Tilt Image Build ###
