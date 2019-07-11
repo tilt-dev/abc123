@@ -1,25 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: varowner-fe
+  name: fe
   labels:
     app: fe
-    owner: varowner
 spec:
   selector:
     matchLabels:
       app: fe
-      owner: varowner
   template:
     metadata:
       labels:
         app: fe
         tier: web
-        owner: varowner
     spec:
       containers:
       - name: fe
-        image: gcr.io/windmill-public-containers/abc123/fe
+        image: abc123/fe
         env:
         - name: TEMPLATE_DIR
           value: "/go/src/github.com/windmilleng/abc123/fe/web/templates"
@@ -32,10 +29,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: varowner-fe
+  name: fe
   labels:
     app: fe
-    owner: varowner
 spec:
   type: LoadBalancer
   ports:
@@ -44,7 +40,6 @@ spec:
       protocol: TCP
   selector:
     app: fe
-    owner: varowner
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1

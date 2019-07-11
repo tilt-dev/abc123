@@ -12,56 +12,72 @@
     * Other notes: does a `pip install` for package dependencies. Reinstalls dependencies iff they have changed.
 """
 
-k8s_resource_assembly_version(2)
+### NOTE: this Tiltfile / incremental onboarding experience currently only works on LOCAL k8s clusters
+### that don't require pushing images -- so, e.g. k8s for Docker for Mac, Minikube + Docker
 
-username = str(local('whoami')).rstrip('\n')
+### Step 0: Hello World ###
+# # Uncomment this to see Tilt do something!
+# print("Welcome to Tilt! 👋")
 
+### Step 1: Kubernetes YAML ###
+# # Start with just your existing Kubernetes yaml -- your services will run (if the
+# # images are available) and you can see their status and logs, but Tilt isn't
+# # building anything for you, so code changes won't be propagated
+# # NOTE: build these images first with `make build` 👀
+# k8s_yaml([
+#     'fe/deployments/fe.yaml',
+#     'letters/deployments/letters.yaml',
+#     'numbers/deployments/numbers.yaml',
+# ])
 
-def with_username(s):
-    return '%s-%s' % (username, s)
+### Step 2: Port Forwarding ###
+# # Uncomment this line to port-forward your frontend so you can hit it locally
+# # Once you've done this, you'll be able to access the 'fe' service in your browser at http://localhost:8000
+# k8s_resource('fe', port_forwards='8000')
 
+### Step 3: Tilt Image Build ###
+# # Uncomment these lines to have Tilt build images for your code (and
+# # smartly re-build whenever things change on disk)
+# # After this and following steps, try changing the first `log.Println` message in `fe/main.go` and see how Tilt behaves.
+# docker_build('abc123/fe', 'fe')            # == `docker build ./fe -t abc123/fe`
+# docker_build('abc123/letters', 'letters')  # == `docker build ./letters -t abc123/letters`
+# docker_build('abc123/numbers', 'numbers')  # == `docker build ./numbers -t abc123/numbers`
 
-def m4_yaml(file):
-    read_file(file)
-    return local('m4 -Dvarowner=%s %s' % (username, repr(file)))
+### Step 4: Live Update ###
+# # The frontend builds pretty slowly, doesn't it? That's because every time you change it,
+# # Docker re-builds the container. Let's use Live Update instead, so nothing gets rebuilt,
+# # and only the files you update get moved around. Uncomment the lines below
+# # NOTE: comment out the `docker_build` for fe above 👀
+# # See docs: https://docs.tilt.dev/live_update_tutorial.html
 
+# # Service: fe
+# docker_build('abc123/fe', 'fe',
+#              live_update=[
+#                  sync('./fe', '/go/src/github.com/windmilleng/abc123/fe'),
+#                  run('go install github.com/windmilleng/abc123/fe'),
+#                  restart_container()
+#              ])
 
-k8s_yaml([
-    m4_yaml('fe/deployments/fe.yaml'),
-    m4_yaml('letters/deployments/letters.yaml'),
-    m4_yaml('numbers/deployments/numbers.yaml'),
-])
-
-repo = local_git_repo('.')
-dockerfile_go = 'Dockerfile.go.base'
-dockerfile_js = 'Dockerfile.js.base'
-dockerfile_py = 'Dockerfile.py.base'
-
-# Service: frontend
-fe_img = 'gcr.io/windmill-public-containers/abc123/fe'
-fe_entrypt = '/go/bin/fe --owner ' + username
-
-fast_build(fe_img, dockerfile_go, fe_entrypt).\
-    add(repo.path('fe'), '/go/src/github.com/windmilleng/abc123/fe').\
-    run('go install github.com/windmilleng/abc123/fe')
-k8s_resource(with_username('fe'), new_name='fe', port_forwards=9000)
-
-# Service: letters
-letters_img = 'gcr.io/windmill-public-containers/abc123/letters'
-letters_entrypt = 'node /app/index.js'
-
-fast_build(letters_img, dockerfile_js, letters_entrypt).\
-    add(repo.path('letters/src'), '/app').\
-    add(repo.path('letters/package.json'), '/app/package.json').\
-    add(repo.path('letters/yarn.lock'), '/app/yarn.lock').\
-    run('cd /app && yarn install', trigger=['letters/package.json', 'letters/yarn.lock'])
-k8s_resource(with_username('letters'), new_name='letters')
-
-# Service: numbers
-numbers_img = 'gcr.io/windmill-public-containers/abc123/numbers'
-numbers_entrypt = 'node /app/index.js'
-
-fast_build(numbers_img, dockerfile_py). \
-    add(repo.path('numbers'), '/app'). \
-    run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt')
-k8s_resource(with_username('numbers'), new_name='numbers')
+### Step 5: Live Update ALL THE THINGS! ###
+# # The other builds are pretty fast, but why not make them even faster? Uncomment
+# # the rest of the Tiltfile to use Live Update for the other services as well.
+# # NOTE: comment out the rest of the `docker_build` calls above 👀
+#
+# # Service: letters
+# docker_build('abc123/letters', 'letters',
+#              live_update=[
+#                  sync('./letters/src', '/app'),
+#                  sync('./letters/package.json', '/app/package.json'),
+#                  sync('./letters/yarn.lock', '/app/yarn.lock'),
+#                  # run `yarn install` IF `package.json` or `yarn.lock` has changed
+#                  run('cd /app && yarn install', trigger=['./letters/package.json', './letters/yarn.lock']),
+#                  restart_container(),
+#              ])
+#
+# # Service: numbers
+# docker_build('abc123/numbers', 'numbers',
+#              live_update=[
+#                  sync('./numbers', '/app'),
+#                  # run `pip install` IF `requirements.txt` has changed
+#                  run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt'),
+#              ])
