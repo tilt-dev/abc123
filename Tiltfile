@@ -12,7 +12,7 @@
     * Other notes: does a `pip install` for package dependencies. Re-installs dependencies iff they have changed.
 """
 
-### NOTE: this Tiltfile / incremental onboarding expereicen currently on work on LOCAL k8s clusters
+### NOTE: this Tiltfile / incremental onboarding experience currently only works on LOCAL k8s clusters
 ### that don't require pushing images -- so, e.g. k8s for Docker for Mac, Minikube + Docker
 
 ### Step 0: Hello World ###
