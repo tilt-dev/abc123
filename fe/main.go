@@ -36,25 +36,20 @@ func main() {
 }
 
 func handleMain(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("> Getting a letter and a number!")
 	t, err := template.ParseFiles(templatePath("index.tpl"))
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "error parsing template: %v\n", err)
-		return
+		log.Fatalf("error parsing template: %v\n", err)
 	}
 
 	let, err := getLetter()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "error getting letter: %v\n", err)
-		return
+		log.Fatalf("error getting letter: %v\n", err)
 	}
 
 	num, err := getNumber()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "error getting number: %v\n", err)
-		return
+		log.Fatalf("error getting number: %v\n", err)
 	}
 
 	info := Info{
@@ -64,9 +59,7 @@ func handleMain(w http.ResponseWriter, r *http.Request) {
 
 	err = t.Execute(w, info)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "error executing template: %v\n", err)
-		return
+		log.Fatalf("error executing template: %v\n", err)
 	}
 }
 

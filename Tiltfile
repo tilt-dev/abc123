@@ -21,6 +21,8 @@ k8s_yaml([
 # Port-forward your frontend so you can hit it locally -- you can access
 # the 'fe' service in your browser at http://localhost:8000
 k8s_resource('fe', port_forwards='8000')
+k8s_resource('letters', port_forwards='8001')
+k8s_resource('numbers', port_forwards='8002')
 
 # For all services, tell Tilt how to build the docker image, and how to Live Update
 # that service -- i.e. how to update a running container in place for faster iteration.
