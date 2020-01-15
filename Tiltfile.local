@@ -12,16 +12,30 @@
     * Other notes: does a `pip install` for package dependencies. Reinstalls dependencies iff they have changed.
 """
 
+numbers_port = 8001
+letters_port = 8002
+
 local_resource(
   'fe',
   'go install github.com/windmilleng/abc123/fe',
-  serve_cmd='cd fe && fe --letters-host=localhost:8001 --numbers-host=localhost:8002',
+  serve_cmd='cd fe && fe --port=8000 --letters-host=localhost:%d --numbers-host=localhost:%d' % (letters_port, numbers_port),
   deps=['fe'],
   # fe reads templates from disk on every request, so we don't need to recompile + restart for changes to them
   ignore=['fe/web/templates']
 )
 
-local_resource('letters', 'cd letters && yarn install', serve_cmd='cd letters/src && node index.js', deps=['letters/package.json', 'letters/yarn.lock', 'letters/src/index.js'])
+local_resource(
+  'letters',
+  'cd letters && yarn install',
+  serve_cmd='cd letters/src && node index.js --port %d' % (letters_port),
+)
+  # deps=['letters'])
 
-local_resource('numbers', 'cd numbers && pip install -r requirements.txt', serve_cmd='cd numbers && python app.py', deps=['numbers/requirements.txt'])
+local_resource(
+  'numbers',
+  'cd numbers && pip install -r requirements.txt',
+  serve_cmd='cd numbers && python app.py --port=%d' % (numbers_port),
+  # numbers is a flask app that handles most changes via hot reloading, but
+  # not requirements.txt changes
+  deps=['numbers/requirements.txt'])
 

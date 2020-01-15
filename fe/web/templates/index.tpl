@@ -59,7 +59,7 @@
   <main>
     <header>Welcome to TILT ✴︎</header>
     <p class="floatl">
-        Your letter is: <strong>{{.Letter}}</strong>!?
+        Your letter is: <strong>{{.Letter}}</strong>
     </p>
     <p class="floatr">
         Your number is: <strong>{{.Number}}</strong>

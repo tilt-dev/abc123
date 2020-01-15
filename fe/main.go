@@ -22,6 +22,7 @@ var serviceOwner = flag.String("owner", "", "If specified, abc123 will look for 
 	"hostnames prefixed with this label")
 var numbersHost = flag.String("numbers-host", svcNumbers, "The host for the numbers service")
 var lettersHost = flag.String("letters-host", svcLetters, "The host for the letters service")
+var port = flag.Int("port", 8080, "The port on which to serve http")
 
 
 type Info struct {
@@ -34,9 +35,8 @@ func main() {
 	http.HandleFunc("/", handleMain)
 	http.HandleFunc("/get_rand", handleTextOnly)
 
-  port := 8000
-	log.Printf("Serving the frontend on :%d\n", port)
-	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	log.Printf("Serving the frontend on :%d\n", *port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), nil))
 }
 
 func handleMain(w http.ResponseWriter, r *http.Request) {

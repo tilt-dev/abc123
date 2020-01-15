@@ -1,5 +1,7 @@
 from random import choice
 
+import argparse
+
 from flask import Flask
 app = Flask(__name__)
 
@@ -11,4 +13,7 @@ def rand_number():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8002)
+    parser = argparse.ArgumentParser(description='start an http server that returns numbers')
+    parser.add_argument('--port', type=int, default=5000, help='port on which to serve http')
+    args = parser.parse_args()
+    app.run(debug=True, host='0.0.0.0', port=args.port)
