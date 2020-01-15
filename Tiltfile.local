@@ -21,7 +21,7 @@ local_resource(
   ignore=['fe/web/templates']
 )
 
-local_resource('letters', 'cd letters && yarn install', serve_cmd='cd letters/src && node index.js', deps=['letters/package.json', 'letters/yarn.lock', 'src/index.js'])
+local_resource('letters', 'cd letters && yarn install', serve_cmd='cd letters/src && node index.js', deps=['letters/package.json', 'letters/yarn.lock', 'letters/src/index.js'])
 
 local_resource('numbers', 'cd numbers && pip install -r requirements.txt', serve_cmd='cd numbers && python app.py', deps=['numbers/requirements.txt'])
 
