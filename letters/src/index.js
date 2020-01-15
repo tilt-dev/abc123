@@ -8,15 +8,17 @@ const letters = immutable.List([
     's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ])
 
+const port = 8001
+
 http.createServer(function (req, res) {
     console.log('Request received!');
     res.writeHead(200, {'Content-Type': 'text/plain'});
     let item = letters.get(Math.floor(Math.random()*letters.size))
     res.end(item + '\n');
-}).listen(5000, "0.0.0.0");
+}).listen(port, "0.0.0.0");
 
 console.log('~~ Setting up the "letters" service ~~')
 console.log('Calibrating the subsonic subspace receiver...');
 console.log('Aligning tricyclic engines with the port transmitters...');
 console.log('Modifying the ventral zero point power converter...');
-console.log('OK: server running at http://127.0.0.1:5000/');
+console.log('OK: server running at http://127.0.0.1:%d/', port);

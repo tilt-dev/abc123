@@ -13,13 +13,16 @@ import (
 	"strings"
 )
 
-var serviceOwner = flag.String("owner", "", "If specified, abc123 will look for "+
-	"service names prefixed with this label")
-
 const (
 	svcLetters = "letters"
 	svcNumbers = "numbers"
 )
+
+var serviceOwner = flag.String("owner", "", "If specified, abc123 will look for "+
+	"hostnames prefixed with this label")
+var numbersHost = flag.String("numbers-host", svcNumbers, "The host for the numbers service")
+var lettersHost = flag.String("letters-host", svcLetters, "The host for the letters service")
+
 
 type Info struct {
 	Letter string
@@ -31,8 +34,9 @@ func main() {
 	http.HandleFunc("/", handleMain)
 	http.HandleFunc("/get_rand", handleTextOnly)
 
-	log.Println("Serving the fontend on :8080")
-	http.ListenAndServe(":8080", nil)
+  port := 8000
+	log.Printf("Serving the frontend on :%d\n", port)
+	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 }
 
 func handleMain(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +70,7 @@ func handleMain(w http.ResponseWriter, r *http.Request) {
 func templatePath(f string) string {
 	dir := os.Getenv("TEMPLATE_DIR")
 	if dir == "" {
-		dir = "fortune/web/templates"
+		dir = "web/templates"
 	}
 
 	return filepath.Join(dir, f)
@@ -92,7 +96,7 @@ func handleTextOnly(w http.ResponseWriter, r *http.Request) {
 }
 
 func getLetter() (string, error) {
-	resp, err := pingPortForService(svcLetters)
+	resp, err := pingPortForService(*lettersHost)
 	if err != nil {
 		return "", err
 	}
@@ -100,7 +104,7 @@ func getLetter() (string, error) {
 }
 
 func getNumber() (int, error) {
-	resp, err := pingPortForService(svcNumbers)
+	resp, err := pingPortForService(*numbersHost)
 	if err != nil {
 		return 0, err
 	}
@@ -114,10 +118,10 @@ func getNumber() (int, error) {
 	return num, nil
 }
 
-func pingPortForService(svcName string) ([]byte, error) {
-	url := fmt.Sprintf("http://%s", svcName)
+func pingPortForService(host string) ([]byte, error) {
+	url := fmt.Sprintf("http://%s", host)
 	if *serviceOwner != "" {
-		url = fmt.Sprintf("http://%s-%s", *serviceOwner, svcName)
+		url = fmt.Sprintf("http://%s-%s", *serviceOwner, host)
 	}
 	resp, err := http.Get(url)
 
