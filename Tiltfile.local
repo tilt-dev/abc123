@@ -1,0 +1,27 @@
+# -*- mode: Python -*-
+
+"""
+* Frontend
+  * Language: Go
+  * Other notes: calls out to both `letters` and `numbers` microservices.
+* Letters
+  * Language: JavaScript
+  * Other notes: Uses yarn. Does a `yarn install` for package dependencies iff they have changed.
+* Numbers
+    * Language: Python
+    * Other notes: does a `pip install` for package dependencies. Reinstalls dependencies iff they have changed.
+"""
+
+local_resource(
+  'fe',
+  'go install github.com/windmilleng/abc123/fe',
+  serve_cmd='cd fe && fe --letters-host=localhost:8001 --numbers-host=localhost:8002',
+  deps=['fe'],
+  # fe reads templates from disk on every request, so we don't need to recompile + restart for changes to them
+  ignore=['fe/web/templates']
+)
+
+local_resource('letters', 'cd letters && yarn install', serve_cmd='cd letters/src && node index.js', deps=['letters/package.json', 'letters/yarn.lock', 'src/index.js'])
+
+local_resource('numbers', 'cd numbers && pip install -r requirements.txt', serve_cmd='cd numbers && python app.py', deps=['numbers/requirements.txt'])
+
