@@ -48,6 +48,11 @@ docker_build('abc123/letters', 'letters',
              ])
 
 # Service: numbers
+# To debug:
+# 1. edit numbers/app.py and add a call to breakpoint() in rand_number()
+# 2. open localhost:8000 in a browser, which will rand_number() (and hence breakpoint()) to be called
+# 3. numbers will now log that it's opened a web_pdb debugger on 5555 and pause execution
+# 4. open http://localhost:5555 in a browser and you've got pdb! (and can 'c'ontinue or 'n'ext or whatever)
 docker_build('abc123/numbers', 'numbers',
              entrypoint='PYTHONBREAKPOINT=web_pdb.set_trace python /app/app.py',
              build_args={'ENABLE_DEBUGGING': 'true'},
