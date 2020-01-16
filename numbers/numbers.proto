@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package numbers;
+
+message NumberRequest {
+  required int32 bonus = 1;
+}
+
+message NumberResponse {
+  required int32 number = 1;
+}
