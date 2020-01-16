@@ -48,12 +48,16 @@ func handleMain(w http.ResponseWriter, r *http.Request) {
 
 	let, err := getLetter()
 	if err != nil {
-		log.Fatalf("error getting letter: %v\n", err)
+		log.Printf("error getting letter: %v\n", err)
+		http.Error(w, "error getting letter", http.StatusInternalServerError)
+		return
 	}
 
 	num, err := getNumber()
 	if err != nil {
-		log.Fatalf("error getting number: %v\n", err)
+		log.Printf("error getting number: %v\n", err)
+		http.Error(w, "error getting number", http.StatusInternalServerError)
+		return
 	}
 
 	info := Info{
