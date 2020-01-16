@@ -2,6 +2,8 @@ from random import choice
 
 import argparse
 
+from gen.pb_python import numbers_pb2
+
 from flask import Flask
 app = Flask(__name__)
 

@@ -22,7 +22,7 @@ local_resource(
   deps=['fe'],
   # fe reads templates from disk on every request, so we don't need to recompile + restart for changes to them
   ignore=['fe/web/templates'],
-  resource_deps=['letters', 'numbers']
+  resource_deps=['letters', 'numbers', 'go_proto']
 )
 
 local_resource(
@@ -30,7 +30,6 @@ local_resource(
   'cd letters && yarn install',
   serve_cmd='cd letters/src && node index.js --port %d' % (letters_port),
 )
-  # deps=['letters'])
 
 local_resource(
   'numbers',
@@ -38,5 +37,15 @@ local_resource(
   serve_cmd='cd numbers && python app.py --port=%d' % (numbers_port),
   # numbers is a flask app that handles most changes via hot reloading, but
   # not requirements.txt changes
-  deps=['numbers/requirements.txt'])
+  deps=['numbers/requirements.txt'],
+  resource_deps=['python_proto'],
+)
+
+# this is for example purposes only - the compiled protobufs are not currently used by the services
+for lang in ['go', 'python']:
+  local_resource(
+    '%s_proto' % (lang),
+    'docker run -v "$PWD/numbers":/defs namely/protoc-all -f numbers.proto -l %s' % (lang),
+    deps=['numbers/numbers.proto'],
+  )
 
