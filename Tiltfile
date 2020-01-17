@@ -53,11 +53,17 @@ docker_build('abc123/letters', 'letters',
 # 2. open localhost:8000 in a browser, which will rand_number() (and hence breakpoint()) to be called
 # 3. numbers will now log that it's opened a web_pdb debugger on 5555 and pause execution
 # 4. open http://localhost:5555 in a browser and you've got pdb! (and can 'c'ontinue or 'n'ext or whatever)
-docker_build('abc123/numbers', 'numbers',
-             entrypoint='PYTHONBREAKPOINT=web_pdb.set_trace python /app/app.py',
-             build_args={'ENABLE_DEBUGGING': 'true'},
+docker_build('abc123/numbers_base', 'numbers',
              live_update=[
                  sync('./numbers', '/app'),
                  # run `pip install` IF `requirements.txt` has changed
                  run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt'),
              ])
+
+docker_build('abc123/numbers',
+  'numbers',
+  dockerfile_contents="""
+    FROM abc123/numbers_base
+    RUN pip install web_pdb
+    ENV PYTHONBREAKPOINT=web_pdb.set_trace
+  """)
