@@ -16,6 +16,7 @@ k8s_yaml([
     'fe/deployments/fe.yaml',
     'letters/deployments/letters.yaml',
     'numbers/deployments/numbers.yaml',
+    'db_writer/deployments/db_writer.yaml',
 ])
 
 # Port-forward your frontend so you can hit it locally -- you can access
@@ -23,6 +24,7 @@ k8s_yaml([
 k8s_resource('fe', port_forwards='8000')
 k8s_resource('letters', port_forwards='8001')
 k8s_resource('numbers', port_forwards='8002')
+k8s_resource('db-writer', port_forwards='8003')
 
 # For all services, tell Tilt how to build the docker image, and how to Live Update
 # that service -- i.e. how to update a running container in place for faster iteration.
@@ -53,4 +55,12 @@ docker_build('abc123/numbers', 'numbers',
                  sync('./numbers', '/app'),
                  # run `pip install` IF `requirements.txt` has changed
                  run('cd /app && pip install -r requirements.txt', trigger='numbers/requirements.txt'),
+             ])
+
+# Service: recorder
+docker_build('abc123/db_writer', 'db_writer',
+             live_update=[
+                 sync('./db_writer', '/go/src/github.com/windmilleng/abc123/db_writer'),
+                 run('go install github.com/windmilleng/abc123/db_writer'),
+                 restart_container()
              ])

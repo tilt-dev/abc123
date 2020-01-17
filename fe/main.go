@@ -9,25 +9,26 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
 const (
 	svcLetters = "letters"
 	svcNumbers = "numbers"
+	svcDBWriter = "db-writer"
 )
 
 var serviceOwner = flag.String("owner", "", "If specified, abc123 will look for "+
 	"hostnames prefixed with this label")
 var numbersHost = flag.String("numbers-host", svcNumbers, "The host for the numbers service")
 var lettersHost = flag.String("letters-host", svcLetters, "The host for the letters service")
+var dbWriterHost = flag.String("db-writer-host", svcDBWriter, "The host for the db_writer service")
 var port = flag.Int("port", 8080, "The port on which to serve http")
 
 
 type Info struct {
 	Letter string
-	Number int
+	Number string
 }
 
 func main() {
@@ -40,6 +41,10 @@ func main() {
 }
 
 func handleMain(w http.ResponseWriter, r *http.Request) {
+	if r.RequestURI != "/" {
+		return
+	}
+
 	fmt.Println("> Getting a letter and a number!")
 	t, err := template.ParseFiles(templatePath("index.tpl"))
 	if err != nil {
@@ -100,33 +105,28 @@ func handleTextOnly(w http.ResponseWriter, r *http.Request) {
 }
 
 func getLetter() (string, error) {
-	resp, err := pingPortForService(*lettersHost)
+	resp, err := getRequest(*lettersHost)
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimSpace(string(resp)), nil
+	letter := strings.TrimSpace(string(resp))
+	postRequest(*dbWriterHost, "letter", letter)
+	return letter, nil
 }
 
-func getNumber() (int, error) {
-	resp, err := pingPortForService(*numbersHost)
+func getNumber() (string, error) {
+	resp, err := getRequest(*numbersHost)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	s := strings.TrimSpace(string(resp))
-	num, err := strconv.Atoi(s)
-	if err != nil {
-		return 0, err
-	}
-
+	num := strings.TrimSpace(string(resp))
+	postRequest(*dbWriterHost, "number", num)
 	return num, nil
 }
 
-func pingPortForService(host string) ([]byte, error) {
-	url := fmt.Sprintf("http://%s", host)
-	if *serviceOwner != "" {
-		url = fmt.Sprintf("http://%s-%s", *serviceOwner, host)
-	}
+func getRequest(host string) ([]byte, error) {
+	url := urlForService(host)
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -134,4 +134,19 @@ func pingPortForService(host string) ([]byte, error) {
 	}
 
 	return ioutil.ReadAll(resp.Body)
+}
+
+func postRequest(host, path, body string) {
+	url := urlForService(host)
+	url = url + "/" + path
+
+	http.Post(url, "text/plain", strings.NewReader(body))
+}
+
+func urlForService(host string) string {
+	url := fmt.Sprintf("http://%s", host)
+	if *serviceOwner != "" {
+		url = fmt.Sprintf("http://%s-%s", *serviceOwner, host)
+	}
+	return url
 }
