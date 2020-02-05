@@ -17,11 +17,11 @@ letters_port = 8002
 
 local_resource(
   'fe',
-  'go install github.com/windmilleng/abc123/fe',
-  serve_cmd='cd fe && fe --port=8000 --letters-host=localhost:%d --numbers-host=localhost:%d' % (letters_port, numbers_port),
+  'go build -o femain fe/main.go',
+  serve_cmd='cd fe && ../femain --port=8000 --letters-host=localhost:%d --numbers-host=localhost:%d' % (letters_port, numbers_port),
   deps=['fe'],
   # fe reads templates from disk on every request, so we don't need to recompile + restart for changes to them
-  ignore=['fe/web/templates'],
+  ignore=['fe/web/templates', 'fe/fe'],
   resource_deps=['letters', 'numbers']
 )
 
@@ -34,7 +34,7 @@ local_resource(
 
 local_resource(
   'numbers',
-  'cd numbers && pip install -r requirements.txt',
+  'cd numbers && pip install --user -r requirements.txt',
   serve_cmd='cd numbers && python app.py --port=%d' % (numbers_port),
   # numbers is a flask app that handles most changes via hot reloading, but
   # not requirements.txt changes
