@@ -10,6 +10,9 @@ RUN wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}
 
 RUN go get github.com/golang/protobuf/protoc-gen-go
 
+ADD start.sh /
+ADD restart.sh /
+
 ADD . /go/src/github.com/windmilleng/abc123/fe
 RUN go install github.com/windmilleng/abc123/fe
 ENTRYPOINT /go/bin/fe

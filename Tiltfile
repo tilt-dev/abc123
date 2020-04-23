@@ -30,10 +30,12 @@ k8s_resource('numbers', port_forwards='8002')
 
 # Service: fe
 docker_build('abc123/fe', 'fe',  # ~equivalent to: docker build -t abc123/fe ./fe
+             entrypoint='/start.sh sh -c "echo hello from shell 👋; /go/bin/fe"',
+             # entrypoint=['/start.sh', 'sh', '-c', 'echo hello from shell 👋; /go/bin/fe'],
              live_update=[
                  sync('./fe', '/go/src/github.com/windmilleng/abc123/fe'),
                  run('go install github.com/windmilleng/abc123/fe'),
-                 restart_container()
+                 run('/restart.sh')
              ])
 
 # Service: letters
