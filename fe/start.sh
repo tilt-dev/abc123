@@ -18,19 +18,20 @@ process_id=""
 trap quit TERM INT
 
 quit() {
-  if [ -n "$process_id" ]; then
-    kill $process_id
+  if [ -n "group_id" ]; then
+    # Kill the whole group
+    kill -group_id
   fi
 }
 
 while true; do
     rm -f restart.txt
 
-    "$@" &
-    process_id=$!
-    echo "$process_id" > process.txt
+    setsid "$@" &
+    group_id=$!
+    echo "$group_id" > group_id.txt
     set +e
-    wait $process_id
+    wait $group_id
     EXIT_CODE=$?
     set -e
     if [ ! -f restart.txt ]; then

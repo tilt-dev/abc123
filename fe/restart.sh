@@ -14,9 +14,9 @@
 set -u
 
 touch restart.txt
-PID="$(cat process.txt)"
+PGID="$(cat group_id.txt)"
 if [ $? -ne 0 ]; then
-  echo "unable to read process.txt. was your process started with start.sh?"
+  echo "unable to read group_id.txt. was your process started with start.sh?"
   exit 1
 fi
-kill "$PID"
+kill -- -"$PGID"
