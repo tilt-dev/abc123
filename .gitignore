@@ -25,3 +25,4 @@ api/*/*.pb.go
 .*.swp
 .*.swx
 
+tilt_modules
