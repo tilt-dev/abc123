@@ -1,0 +1,22 @@
+{
+  "Extensions": [
+    {
+      "Name": "restart_process",
+      "GitCommitHash": "d0fc5e517421e44b35ee2938c8639c0ce0e315a2",
+      "ExtensionRegistry": "https://github.com/windmilleng/tilt-extensions",
+      "TimeFetched": "2020-04-23T18:23:43.824808-04:00"
+    },
+    {
+      "Name": "restart_process",
+      "GitCommitHash": "5951cea8f7fb8350473babdad56b73103d235234",
+      "ExtensionRegistry": "https://github.com/windmilleng/tilt-extensions",
+      "TimeFetched": "2020-04-28T17:35:03.406097-04:00"
+    },
+    {
+      "Name": "restart_process",
+      "GitCommitHash": "2158573741bc54bcd7e186b097e21f396e3d19b2",
+      "ExtensionRegistry": "https://github.com/windmilleng/tilt-extensions",
+      "TimeFetched": "2020-04-28T17:46:16.231477-04:00"
+    }
+  ]
+}
