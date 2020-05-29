@@ -12,6 +12,7 @@
   * Other notes: does a `pip install` for package dependencies. Re-installs dependencies iff they have changed.
 """
 load('ext://restart_process', 'docker_build_with_restart')
+load('ext://restart_process', 'custom_build_with_restart')
 
 k8s_yaml([
     'fe/deployments/fe.yaml',
@@ -38,7 +39,10 @@ docker_build_with_restart('abc123/fe', 'fe',  # ~equivalent to: docker build -t 
              ])
 
 # Service: letters
-docker_build_with_restart('abc123/letters', 'letters', 'node /app/index.js',
+custom_build_with_restart('abc123/letters',
+             'docker build -t $EXPECTED_REF ./letters',
+             ['./letters'],
+             entrypoint='node /app/index.js',
              live_update=[
                  sync('./letters/src', '/app'),
                  sync('./letters/package.json', '/app/package.json'),
