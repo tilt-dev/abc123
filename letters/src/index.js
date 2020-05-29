@@ -22,7 +22,7 @@ http.createServer(function (req, res) {
     res.end(item + '\n');
 }).listen(argv.port, "0.0.0.0");
 
-console.log('~~ Setting up the "letters" service ~~')
+console.log('~~ let us seeee ~~')
 console.log('Calibrating the subsonic subspace receiver...');
 console.log('Aligning tricyclic engines with the port transmitters...');
 console.log('Modifying the ventral zero point power converter...');
