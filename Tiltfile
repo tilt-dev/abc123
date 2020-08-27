@@ -21,13 +21,16 @@ k8s_yaml([
 
 # Port-forward services so you can hit it them locally -- e.g. you
 # can access the 'fe' service in your browser at http://localhost:8000
-k8s_resource('fe', port_forwards='8000')
-k8s_resource('letters', port_forwards='8001')
-k8s_resource('numbers', port_forwards='8002')
+k8s_resource('fe', port_forwards='8000', resource_deps=['launch'])
+k8s_resource('letters', port_forwards='8001', resource_deps=['launch'])
+k8s_resource('numbers', port_forwards='8002', resource_deps=['launch'])
 
 # For all services, tell Tilt how to build the docker image, and how to Live Update
 # that service -- i.e. how to update a running container in place for faster iteration.
 # See docs: https://docs.tilt.dev/live_update_tutorial.html
+
+local_resource('database', cmd='echo database up and running')
+local_resource('launch', cmd='echo 🚀', trigger_mode=TRIGGER_MODE_MANUAL, auto_init=False)
 
 # Service: fe
 docker_build_with_restart('abc123/fe', 'fe',  # ~equivalent to: docker build -t abc123/fe ./fe
