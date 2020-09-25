@@ -1,9 +1,11 @@
 FROM node:10
 
-ADD src /app
-ADD package.json /app/package.json
-ADD yarn.lock /app/yarn.lock
+WORKDIR /app
+ADD package.json package.json
+ADD yarn.lock yarn.lock
 
-RUN cd /app && yarn install
+RUN yarn install
+
+ADD src .
 
 ENTRYPOINT [ "node", "/app/index.js" ]

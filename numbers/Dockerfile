@@ -1,6 +1,9 @@
 FROM python:3.6
 
-ADD . /app
-RUN cd /app && pip install -r requirements.txt
+WORKDIR /app
+ADD requirements.txt .
+RUN pip install -r requirements.txt
+
+ADD . .
 
 ENTRYPOINT ["./app.py"]
